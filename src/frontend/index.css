@@ -1,0 +1,185 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Fonts ──────────────────────────────────────────────────── */
+@font-face {
+  font-family: "Playfair Display";
+  src: url("/assets/fonts/PlayfairDisplay-VariableFont_wght.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "General Sans";
+  src: url("/assets/fonts/GeneralSans-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ─── OKLCH Design Tokens ────────────────────────────────────── */
+@layer base {
+  :root {
+    --radius: 0.75rem;
+
+    /* Deep navy dark theme — #020617 base */
+    --background: 0.08 0.025 264;        /* #020617 */
+    --foreground: 1 0 0;                  /* #FFFFFF */
+
+    --card: 0.14 0.03 258;               /* #0F172A */
+    --card-foreground: 1 0 0;
+
+    --popover: 0.21 0.04 255;            /* #1E293B */
+    --popover-foreground: 1 0 0;
+
+    /* Cyan primary accent — #00E5FF */
+    --primary: 0.88 0.16 200;            /* #00E5FF */
+    --primary-foreground: 0.08 0.025 264;
+
+    /* Blue-cyan secondary — #38BDF8 */
+    --secondary: 0.78 0.12 215;          /* #38BDF8 */
+    --secondary-foreground: 0.08 0.025 264;
+
+    --muted: 0.21 0.04 255;              /* #1E293B */
+    --muted-foreground: 0.52 0.04 255;   /* #64748B */
+
+    --accent: 0.83 0.13 205;             /* #22D3EE */
+    --accent-foreground: 0.08 0.025 264;
+
+    --destructive: 0.62 0.22 25;
+    --destructive-foreground: 0.98 0 0;
+
+    --border: 0.31 0.045 255;            /* #334155 */
+    --input: 0.21 0.04 255;              /* #1E293B */
+    --ring: 0.88 0.16 200;               /* #00E5FF */
+
+    /* Charts */
+    --chart-1: 0.88 0.16 200;
+    --chart-2: 0.83 0.13 205;
+    --chart-3: 0.78 0.12 215;
+    --chart-4: 0.72 0.18 45;
+    --chart-5: 0.65 0.15 300;
+
+    /* Sidebar */
+    --sidebar: 0.10 0.03 260;
+    --sidebar-foreground: 1 0 0;
+    --sidebar-primary: 0.88 0.16 200;
+    --sidebar-primary-foreground: 0.08 0.025 264;
+    --sidebar-accent: 0.21 0.04 255;
+    --sidebar-accent-foreground: 1 0 0;
+    --sidebar-border: 0.31 0.045 255;
+    --sidebar-ring: 0.88 0.16 200;
+
+    /* Custom luxury tokens — cyan family */
+    --cyan: 0.88 0.16 200;               /* primary accent #00E5FF */
+    --cyan-light: 0.93 0.12 200;
+    --cyan-dim: 0.65 0.10 205;
+    --aqua: 0.83 0.13 205;               /* #22D3EE */
+    --aqua-dim: 0.65 0.10 205;
+    --navy: 0.08 0.025 264;              /* #020617 */
+    --navy-mid: 0.14 0.03 258;           /* #0F172A */
+    --navy-light: 0.21 0.04 255;         /* #1E293B */
+    --card-mid: 0.31 0.045 255;          /* #334155 */
+    --glass-bg: 0.14 0.03 258;
+    --glass-border: 0.31 0.045 255;
+
+    /* Gold — ONLY for star ratings in testimonials */
+    --gold: 0.78 0.14 85;
+    --star-gold: 0.78 0.14 85;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: "General Sans", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+/* ─── Utility classes ────────────────────────────────────────── */
+@layer utilities {
+  .font-display {
+    font-family: "Playfair Display", Georgia, serif;
+  }
+
+  .glass {
+    background: oklch(var(--glass-bg) / 0.45);
+    backdrop-filter: blur(16px) saturate(1.5);
+    -webkit-backdrop-filter: blur(16px) saturate(1.5);
+    border: 1px solid oklch(var(--glass-border) / 0.35);
+  }
+
+  .glass-strong {
+    background: oklch(var(--glass-bg) / 0.7);
+    backdrop-filter: blur(24px) saturate(1.8);
+    -webkit-backdrop-filter: blur(24px) saturate(1.8);
+    border: 1px solid oklch(var(--glass-border) / 0.5);
+  }
+
+  /* Cyan accent utilities (replaces gold throughout UI) */
+  .text-cyan {
+    color: oklch(var(--cyan));
+  }
+
+  .text-aqua {
+    color: oklch(var(--aqua));
+  }
+
+  /* Keep text-gold mapped to cyan for UI (not star ratings) */
+  .text-gold {
+    color: oklch(var(--cyan));
+  }
+
+  .border-cyan {
+    border-color: oklch(var(--cyan) / 0.5);
+  }
+
+  .border-gold {
+    border-color: oklch(var(--cyan) / 0.5);
+  }
+
+  .border-aqua {
+    border-color: oklch(var(--aqua) / 0.5);
+  }
+
+  .glow-cyan {
+    box-shadow: 0 0 20px oklch(var(--cyan) / 0.4), 0 0 40px oklch(var(--cyan) / 0.15);
+  }
+
+  /* Keep glow-gold mapped to cyan */
+  .glow-gold {
+    box-shadow: 0 0 20px oklch(var(--cyan) / 0.4), 0 0 40px oklch(var(--cyan) / 0.15);
+  }
+
+  .glow-aqua {
+    box-shadow: 0 0 20px oklch(var(--aqua) / 0.4), 0 0 40px oklch(var(--aqua) / 0.15);
+  }
+
+  .section-padding {
+    @apply py-20 px-4 sm:px-6 lg:px-8;
+  }
+}
+
+/* ─── Scrollbar ──────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: oklch(var(--navy));
+}
+::-webkit-scrollbar-thumb {
+  background: oklch(var(--cyan-dim));
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(var(--cyan));
+}
