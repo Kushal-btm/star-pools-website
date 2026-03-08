@@ -48,7 +48,7 @@ import {
   Upload,
   X,
 } from "lucide-react";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Category, type Project, type Testimonial } from "../backend.d";
 import { useActor } from "../hooks/useActor";
@@ -1781,8 +1781,56 @@ function InquiriesTab() {
 // ─── Login Screen ─────────────────────────────────────────────────────────────
 
 function LoginScreen({ setPage }: { setPage: (p: AdminPage) => void }) {
-  const { login, isLoggingIn, isLoginError, loginError, isInitializing } =
-    useInternetIdentity();
+  const {
+    login,
+    isLoggingIn,
+    isLoginError,
+    loginError,
+    isInitializing,
+    loginStatus,
+  } = useInternetIdentity();
+  const [pendingLogin, setPendingLogin] = useState(false);
+  const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // When a login was queued while initializing, fire it once idle
+  useEffect(() => {
+    if (pendingLogin && loginStatus === "idle") {
+      setPendingLogin(false);
+      login();
+    }
+  }, [pendingLogin, loginStatus, login]);
+
+  // Clean up timer on unmount
+  useEffect(() => {
+    return () => {
+      if (retryTimerRef.current) clearTimeout(retryTimerRef.current);
+    };
+  }, []);
+
+  const handleLoginClick = () => {
+    if (isLoggingIn) return;
+    if (isInitializing) {
+      // Queue the login -- it will fire automatically once AuthClient is ready
+      setPendingLogin(true);
+      return;
+    }
+    login();
+  };
+
+  // Detect the "not initialized" error and auto-retry
+  useEffect(() => {
+    if (isLoginError && loginError?.message?.includes("not initialized")) {
+      retryTimerRef.current = setTimeout(() => {
+        setPendingLogin(true);
+      }, 800);
+    }
+  }, [isLoginError, loginError]);
+
+  const isNotInitializedError =
+    isLoginError && loginError?.message?.includes("not initialized");
+  const showError = isLoginError && !isNotInitializedError;
+  const isBusy =
+    isLoggingIn || isInitializing || pendingLogin || isNotInitializedError;
 
   return (
     <div
@@ -1836,7 +1884,7 @@ function LoginScreen({ setPage }: { setPage: (p: AdminPage) => void }) {
 
         {/* Internet Identity Login */}
         <div className="space-y-4">
-          {isLoginError && loginError && (
+          {showError && loginError && (
             <div
               className="rounded-xl px-4 py-3 text-sm text-center"
               style={{
@@ -1854,11 +1902,8 @@ function LoginScreen({ setPage }: { setPage: (p: AdminPage) => void }) {
             type="button"
             className="w-full h-12 font-semibold text-sm gap-3 rounded-xl"
             data-ocid="admin.login_submit_button"
-            disabled={isLoggingIn || isInitializing}
-            onClick={() => {
-              if (isInitializing || isLoggingIn) return;
-              login();
-            }}
+            disabled={isBusy}
+            onClick={handleLoginClick}
             style={{
               background: "oklch(0.88 0.16 200)",
               color: "oklch(0.08 0.025 264)",
@@ -1870,7 +1915,7 @@ function LoginScreen({ setPage }: { setPage: (p: AdminPage) => void }) {
                 <Loader2 className="w-4 h-4 animate-spin" />
                 Signing in...
               </>
-            ) : isInitializing ? (
+            ) : isInitializing || pendingLogin || isNotInitializedError ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
                 Initializing...
